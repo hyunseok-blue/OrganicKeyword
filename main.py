@@ -16,326 +16,124 @@ st.set_page_config(
     layout="wide"
 )
 
-# 커스텀 CSS
+# 심플한 CSS
 st.markdown("""
 <style>
-    /* 모든 테마에서 잘 보이는 중립적 디자인 */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    
-    * {
-        font-family: 'Inter', sans-serif;
-    }
-    
-    /* 사이드바 - 모든 테마에서 잘 보이도록 */
-    section[data-testid="stSidebar"] {
-        background: linear-gradient(135deg, #6B73FF 0%, #000DFF 100%);
-        border-right: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    section[data-testid="stSidebar"] .stTextInput label,
-    section[data-testid="stSidebar"] h2 {
-        color: white !important;
-    }
-    
-    /* 입력창 디자인 - 모든 테마 호환 */
+    /* 깔끔하고 미니멀한 디자인 */
     .stTextInput > div > div > input {
-        background: rgba(107, 115, 255, 0.05);
-        border: 2px solid rgba(107, 115, 255, 0.3);
-        border-radius: 12px;
-        padding: 14px 20px;
-        font-size: 16px;
-        font-weight: 500;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        color: inherit;
+        background-color: transparent;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
+        padding: 8px 12px;
+        font-size: 14px;
+        transition: border-color 0.2s;
     }
     .stTextInput > div > div > input:focus {
-        background: rgba(107, 115, 255, 0.1);
-        border-color: #6B73FF;
-        box-shadow: 0 0 0 4px rgba(107, 115, 255, 0.1);
-        outline: none;
-    }
-    .stTextInput > div > div > input::placeholder {
-        color: rgba(107, 115, 255, 0.6);
+        border-color: rgba(0, 0, 0, 0.8);
+        box-shadow: none;
     }
     
-    /* 사이드바 입력창 */
-    section[data-testid="stSidebar"] .stTextInput > div > div > input {
-        background: rgba(255, 255, 255, 0.15);
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        color: white;
-    }
-    section[data-testid="stSidebar"] .stTextInput > div > div > input:focus {
-        background: rgba(255, 255, 255, 0.2);
-        border-color: white;
-        box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1);
-    }
-    section[data-testid="stSidebar"] .stTextInput > div > div > input::placeholder {
-        color: rgba(255, 255, 255, 0.7);
-    }
-    
-    /* 버튼 디자인 - 그라디언트 */
     .stButton > button {
-        background: linear-gradient(135deg, #6B73FF 0%, #000DFF 100%);
+        background-color: #000;
         color: white;
-        border-radius: 12px;
-        padding: 14px 32px;
-        font-weight: 600;
-        font-size: 16px;
         border: none;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 4px 12px rgba(107, 115, 255, 0.4);
-        position: relative;
-        overflow: hidden;
+        border-radius: 4px;
+        padding: 8px 20px;
+        font-weight: 500;
+        font-size: 14px;
+        transition: opacity 0.2s;
     }
     .stButton > button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 24px rgba(107, 115, 255, 0.6);
-    }
-    .stButton > button:active {
-        transform: translateY(0);
-    }
-    
-    /* 메트릭 카드 - 라이트/다크 모드 호환 */
-    .metric-card {
-        background: linear-gradient(135deg, rgba(107, 115, 255, 0.1) 0%, rgba(0, 13, 255, 0.05) 100%);
-        padding: 30px;
-        border-radius: 16px;
-        margin: 15px 0;
-        border: 1px solid rgba(107, 115, 255, 0.2);
-        position: relative;
-        overflow: hidden;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .metric-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(135deg, transparent 0%, rgba(107, 115, 255, 0.1) 100%);
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-    .metric-card:hover::before {
-        opacity: 1;
-    }
-    .metric-card:hover {
-        transform: translateY(-4px);
-        border-color: rgba(107, 115, 255, 0.4);
-        box-shadow: 0 12px 32px rgba(107, 115, 255, 0.2);
-    }
-    .metric-card h3 {
-        font-size: 3em;
-        font-weight: 700;
-        margin: 0;
-        background: linear-gradient(135deg, #6B73FF 0%, #000DFF 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        line-height: 1;
-    }
-    .metric-card p {
-        font-size: 1.1em;
-        margin-top: 8px;
-        font-weight: 500;
-        opacity: 0.7;
-    }
-    
-    /* 결과 카드 - 모던 디자인 */
-    .result-card {
-        background: linear-gradient(to right, rgba(107, 115, 255, 0.05) 0%, transparent 100%);
-        padding: 24px;
-        border-radius: 12px;
-        margin: 12px 0;
-        border: 1px solid rgba(107, 115, 255, 0.15);
-        border-left: 4px solid #6B73FF;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-    }
-    .result-card:hover {
-        transform: translateX(8px);
-        background: linear-gradient(to right, rgba(107, 115, 255, 0.1) 0%, transparent 100%);
-        border-color: rgba(107, 115, 255, 0.3);
-        box-shadow: 0 8px 24px rgba(107, 115, 255, 0.15);
-    }
-    .result-card h4 {
-        margin: 0 0 12px 0;
-        font-weight: 600;
-        font-size: 1.1em;
-    }
-    .result-card p {
-        margin: 6px 0;
-        font-size: 0.95em;
         opacity: 0.8;
-        line-height: 1.5;
     }
     
-    /* 탭 디자인 */
-    .stTabs [data-baseweb="tab-list"] {
-        background: rgba(107, 115, 255, 0.05);
-        border-radius: 12px;
-        padding: 4px;
-        gap: 4px;
-    }
-    .stTabs [data-baseweb="tab"] {
-        background: transparent;
-        border-radius: 8px;
-        font-weight: 600;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        color: inherit;
-        opacity: 0.7;
-    }
-    .stTabs [data-baseweb="tab"]:hover {
-        opacity: 1;
-        background: rgba(107, 115, 255, 0.1);
-    }
-    .stTabs [aria-selected="true"] {
-        background: linear-gradient(135deg, #6B73FF 0%, #000DFF 100%);
-        color: white;
-        opacity: 1;
-    }
-    
-    /* 프로그레스 바 */
-    .stProgress > div > div > div {
-        background: linear-gradient(90deg, #6B73FF 0%, #000DFF 100%);
-        height: 6px;
-        border-radius: 3px;
-    }
-    .stProgress > div > div {
-        background: rgba(107, 115, 255, 0.2);
-        border-radius: 3px;
-        height: 6px;
-    }
-    
-    /* 헤더 타이틀 */
-    h1 {
-        font-weight: 800;
-        letter-spacing: -0.02em;
-        line-height: 1.2;
-    }
-    h2 {
-        font-weight: 700;
-        letter-spacing: -0.01em;
-    }
-    h3 {
-        font-weight: 600;
-        letter-spacing: -0.01em;
-    }
-    
-    /* 에러/성공 메시지 */
-    .stAlert {
-        border-radius: 12px;
-        border: 1px solid rgba(107, 115, 255, 0.2);
-        background-color: rgba(107, 115, 255, 0.05);
-    }
-    
-    /* 다운로드 버튼 */
     .stDownloadButton > button {
-        background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+        background-color: #000;
         color: white;
-        border-radius: 12px;
-        padding: 14px 32px;
-        font-weight: 600;
-        font-size: 16px;
         border: none;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+        border-radius: 4px;
+        padding: 8px 20px;
+        font-weight: 500;
+        font-size: 14px;
+        transition: opacity 0.2s;
     }
     .stDownloadButton > button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 24px rgba(255, 107, 107, 0.6);
+        opacity: 0.8;
     }
     
-    /* 숫자 입력 */
-    .stNumberInput > div > div > input {
-        background: rgba(107, 115, 255, 0.05);
-        border: 2px solid rgba(107, 115, 255, 0.3);
-        border-radius: 12px;
-        padding: 14px 20px;
-        font-weight: 500;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .stNumberInput > div > div > input:focus {
-        background: rgba(107, 115, 255, 0.1);
-        border-color: #6B73FF;
-        box-shadow: 0 0 0 4px rgba(107, 115, 255, 0.1);
+    .metric-card {
+        background-color: rgba(0, 0, 0, 0.03);
+        padding: 20px;
+        border-radius: 4px;
+        margin: 10px 0;
+        text-align: center;
     }
     
-    /* 선택 박스 */
-    .stSelectbox > div > div {
-        background: rgba(107, 115, 255, 0.05);
-        border-radius: 12px;
-        border: 2px solid rgba(107, 115, 255, 0.3);
-        font-weight: 500;
-    }
-    .stSelectbox > div > div:hover {
-        border-color: #6B73FF;
-    }
-    
-    /* 파일 업로더 */
-    section[data-testid="stFileUploadDropzone"] {
-        background: rgba(107, 115, 255, 0.05);
-        border: 2px dashed rgba(107, 115, 255, 0.3);
-        border-radius: 12px;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    section[data-testid="stFileUploadDropzone"]:hover {
-        background: rgba(107, 115, 255, 0.1);
-        border-color: #6B73FF;
-    }
-    
-    /* 데이터프레임 */
-    .dataframe {
-        border-radius: 12px;
-        overflow: hidden;
-        border: 1px solid rgba(107, 115, 255, 0.2);
-    }
-    
-    /* 텍스트 입력 레이블 */
-    .stTextInput > label {
+    .metric-card h3 {
+        font-size: 2em;
         font-weight: 600;
-        font-size: 14px;
-        margin-bottom: 8px;
+        margin: 0;
+        color: inherit;
     }
     
-    /* 스크롤바 */
-    ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-    }
-    ::-webkit-scrollbar-track {
-        background: rgba(107, 115, 255, 0.05);
-        border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb {
-        background: rgba(107, 115, 255, 0.3);
-        border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-        background: rgba(107, 115, 255, 0.5);
+    .metric-card p {
+        margin: 5px 0 0 0;
+        opacity: 0.7;
+        font-size: 0.9em;
     }
     
-    /* 컨테이너 패딩 */
-    .block-container {
-        padding-top: 2rem;
-        padding-bottom: 2rem;
-    }
-    
-    /* 안내 텍스트 */
-    .stMarkdown {
-        line-height: 1.6;
-    }
-    
-    /* 키워드 입력 레이볻 */
-    .search-input-container {
-        position: relative;
-    }
-    
-    /* 성공/에러 메시지 아이콘 */
-    .stSuccess, .stError, .stWarning, .stInfo {
+    .result-card {
+        background-color: rgba(0, 0, 0, 0.03);
         padding: 16px;
-        border-radius: 12px;
+        border-radius: 4px;
+        margin: 8px 0;
+        border-left: 3px solid rgba(0, 0, 0, 0.8);
+    }
+    
+    .result-card h4 {
+        margin: 0 0 8px 0;
         font-weight: 500;
+        font-size: 1em;
+    }
+    
+    .result-card p {
+        margin: 4px 0;
+        font-size: 0.9em;
+        opacity: 0.8;
+    }
+    
+    div[data-testid="stSidebar"] {
+        background-color: rgba(0, 0, 0, 0.02);
+    }
+    
+    .stProgress > div > div > div > div {
+        background-color: #000;
+    }
+    
+    h1, h2, h3 {
+        font-weight: 600;
+    }
+    
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 2px;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        background-color: transparent;
+        color: inherit;
+        border-bottom: 2px solid transparent;
+        border-radius: 0;
+        padding-bottom: 8px;
+    }
+    
+    .stTabs [aria-selected="true"] {
+        border-bottom-color: #000;
+    }
+    
+    hr {
+        margin: 20px 0;
+        border: none;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -517,20 +315,11 @@ def analyze_organic_rankings(webkr_records, shopping_records, target_domain=None
 
 # 메인 앱
 def main():
-    st.markdown("""
-    <h1 style='text-align: center; background: linear-gradient(135deg, #6B73FF 0%, #000DFF 100%); 
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
-    font-size: 3.5em; margin-bottom: 10px; font-weight: 800;'>
-    네이버 쇼핑 키워드 분석기
-    </h1>
-    <p style='text-align: center; font-size: 1.2em; opacity: 0.7; margin-bottom: 40px;'>
-    🔍 실시간 키워드 분석과 상품 정보 수집
-    </p>
-    """, unsafe_allow_html=True)
+    st.title("🔍 네이버 쇼핑 키워드 분석기")
     
     # 사이드바 - API 설정
     with st.sidebar:
-        st.markdown("<h2 style='color: white; text-align: center; margin-bottom: 30px; font-weight: 700;'>⚙️ API 설정</h2>", unsafe_allow_html=True)
+        st.header("⚙️ API 설정")
         
         if 'client_id' not in st.session_state:
             st.session_state.client_id = ""
@@ -570,7 +359,7 @@ def main():
         col1, col2 = st.columns([1, 1])
         
         with col1:
-            st.markdown("<h3 style='margin-bottom: 25px; font-weight: 600;'>🎯 검색 설정</h3>", unsafe_allow_html=True)
+            st.subheader("검색 설정")
             keyword = st.text_input("분석할 키워드:", placeholder="예: 운동화, 런닝화, 스니커즈...")
         
         with col2:
@@ -605,8 +394,8 @@ def main():
                     if len(results['shopping']) == 0:
                         st.warning("🔍 검색 결과가 없습니다.")
                     else:
-                        st.markdown("<h3 style='margin: 30px 0 25px 0; font-weight: 600;'>📊 검색 결과</h3>", unsafe_allow_html=True)
-                        st.markdown(f"<div class='metric-card' style='text-align: center;'><h3>{len(results['shopping'])}</h3><p>개의 상품을 찾았습니다</p></div>", unsafe_allow_html=True)
+                        st.subheader("📊 검색 결과")
+                        st.markdown(f"<div class='metric-card'><h3>{len(results['shopping'])}</h3><p>개의 상품을 찾았습니다</p></div>", unsafe_allow_html=True)
                         
                         # 결과를 카드 형태로 표시
                         for i, item in enumerate(results['shopping'][:20]):
@@ -620,13 +409,13 @@ def main():
                             <div class='result-card'>
                                 <h4>{i+1}. {item['title']}</h4>
                                 <p>🏪 <strong>{item['mallName']}</strong>{brand_info}{maker_info}</p>
-                                <p>💰 <strong style='color: #6B73FF; font-size: 1.1em;'>{price}</strong></p>
+                                <p>💰 <strong>{price}</strong></p>
                                 <p>📂 {category}</p>
                             </div>
                             """, unsafe_allow_html=True)
     
     with tab2:
-        st.markdown("<h3 style='margin-bottom: 25px; font-weight: 600;'>📝 일괄 키워드 분석</h3>", unsafe_allow_html=True)
+        st.subheader("📝 일괄 키워드 분석")
         
         # 예시 파일 다운로드 기능
         col1, col2 = st.columns([1, 3])
@@ -780,7 +569,7 @@ def main():
                     result_df = pd.DataFrame(all_results)
                     
                     # 결과 요약
-                    st.markdown("<h3 style='margin: 30px 0 25px 0; font-weight: 600;'>📊 분석 결과</h3>", unsafe_allow_html=True)
+                    st.subheader("📊 분석 결과")
                     col1, col2, col3 = st.columns(3)
                     with col1:
                         st.markdown(f"<div class='metric-card'><h3>{len(keywords):,}</h3><p>총 키워드</p></div>", unsafe_allow_html=True)
@@ -790,11 +579,9 @@ def main():
                         if 'mall' in result_df.columns:
                             unique_malls = result_df['mall'].nunique()
                             st.markdown(f"<div class='metric-card'><h3>{unique_malls:,}</h3><p>쇼핑몰 수</p></div>", unsafe_allow_html=True)
-                else:
-                    st.warning("🔍 검색 결과가 없습니다.")
                     
                     # 전체 데이터 표시
-                    st.markdown("<h3 style='margin: 30px 0 25px 0; font-weight: 600;'>🗂️ 전체 검색 결과</h3>", unsafe_allow_html=True)
+                    st.subheader("🗂️ 전체 검색 결과")
                     st.dataframe(result_df, use_container_width=True, height=600)
                     
                     # 엑셀 다운로드
@@ -831,6 +618,8 @@ def main():
                         file_name=f"naver_search_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
                         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                     )
+                else:
+                    st.warning("🔍 검색 결과가 없습니다.")
     
     # 사용 가이드
     with st.expander("📖 사용 가이드"):
