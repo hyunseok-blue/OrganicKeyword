@@ -134,6 +134,12 @@ def search_naver_webkr(query, client_id, client_secret, display=10):
             return response.text
         elif response.status_code == 401:
             return "AUTH_ERROR"
+        elif response.status_code == 429:
+            return "RATE_LIMIT"
+        elif response.status_code == 400:
+            return "BAD_REQUEST"
+        elif response.status_code == 500:
+            return "SERVER_ERROR"
         else:
             return None
     except Exception as e:
@@ -159,6 +165,12 @@ def search_naver_shopping(query, client_id, client_secret, display=20):
             return response.text
         elif response.status_code == 401:
             return "AUTH_ERROR"
+        elif response.status_code == 429:
+            return "RATE_LIMIT"
+        elif response.status_code == 400:
+            return "BAD_REQUEST"
+        elif response.status_code == 500:
+            return "SERVER_ERROR"
         else:
             return None
     except Exception as e:
@@ -286,7 +298,16 @@ def main():
                 # 쇼핑검색
                 shopping_xml = search_naver_shopping(keyword, client_id, client_secret)
                 if shopping_xml == "AUTH_ERROR":
-                    st.error("❌ API 키를 확인해주세요. 잘못된 인증정보입니다.")
+                    st.error("❌ API 키를 확인해주세요. 또는 네이버 개발자 센터에서 할당량을 확인해주세요!")
+                    return
+                elif shopping_xml == "RATE_LIMIT":
+                    st.error("⏰ API 사용 한도를 초과했습니다. 네이버 개발자 센터에서 할당량을 확인해주세요!")
+                    return
+                elif shopping_xml == "BAD_REQUEST":
+                    st.error("❌ 잘못된 요청입니다. 검색어나 파라미터를 확인해주세요.")
+                    return
+                elif shopping_xml == "SERVER_ERROR":
+                    st.error("⚠️ 네이버 서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.")
                     return
                 elif shopping_xml:
                     shopping_records = parse_shopping_xml(shopping_xml)
@@ -425,7 +446,16 @@ def main():
                     # 쇼핑검색
                     shopping_xml = search_naver_shopping(keyword, client_id, client_secret, display=display_count)
                     if shopping_xml == "AUTH_ERROR":
-                        st.error("❌ API 키를 확인해주세요. 잘못된 인증정보입니다.")
+                        st.error("❌ API 키를 확인해주세요. 또는 네이버 개발자 센터에서 할당량을 확인해주세요!")
+                        return
+                    elif shopping_xml == "RATE_LIMIT":
+                        st.error("⏰ API 사용 한도를 초과했습니다. 네이버 개발자 센터에서 할당량을 확인해주세요!")
+                        return
+                    elif shopping_xml == "BAD_REQUEST":
+                        st.error("❌ 잘못된 요청입니다. 검색어나 파라미터를 확인해주세요.")
+                        return
+                    elif shopping_xml == "SERVER_ERROR":
+                        st.error("⚠️ 네이버 서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.")
                         return
                     elif shopping_xml:
                         shopping_records = parse_shopping_xml(shopping_xml)
