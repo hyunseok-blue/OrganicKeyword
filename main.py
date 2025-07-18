@@ -19,50 +19,234 @@ st.set_page_config(
 # 커스텀 CSS
 st.markdown("""
 <style>
+    /* 전체 배경 그라디언트 */
+    .stApp {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    /* 메인 컨테이너 */
+    section[data-testid="stSidebar"] {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        margin: 10px;
+        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+    }
+    
+    /* 입력창 디자인 */
     .stTextInput > div > div > input {
-        background-color: #f0f2f6;
-        border: 2px solid #e0e0e0;
-        border-radius: 10px;
-        padding: 10px;
+        background: rgba(255, 255, 255, 0.9);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 15px;
+        padding: 12px 20px;
         font-size: 16px;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
     }
     .stTextInput > div > div > input:focus {
-        border-color: #4CAF50;
-        box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+        border-color: #667eea;
+        box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
+        transform: scale(1.02);
     }
+    
+    /* 버튼 디자인 */
     .stButton > button {
-        background-color: #4CAF50;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
-        border-radius: 20px;
-        padding: 10px 24px;
-        font-weight: bold;
+        border-radius: 25px;
+        padding: 12px 30px;
+        font-weight: 600;
         border: none;
-        transition: all 0.3s;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
     .stButton > button:hover {
-        background-color: #45a049;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
     }
+    
+    /* 메트릭 카드 */
     .metric-card {
-        background-color: #ffffff;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 25px;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+        margin: 15px 0;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+    }
+    .metric-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 50px rgba(102, 126, 234, 0.4);
+    }
+    .metric-card h3 {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 2.5em;
+        font-weight: 700;
+        margin: 0;
+    }
+    .metric-card p {
+        color: #666;
+        font-size: 1.1em;
+        margin-top: 5px;
+    }
+    
+    /* 결과 카드 */
+    .result-card {
+        background: rgba(255, 255, 255, 0.95);
         padding: 20px;
         border-radius: 15px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        margin: 10px 0;
+        margin: 15px 0;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        border-left: 5px solid;
+        border-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%) 1;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
     }
-    .result-card {
-        background-color: #f8f9fa;
-        padding: 15px;
+    .result-card:hover {
+        transform: translateX(10px);
+        box-shadow: 0 8px 30px rgba(102, 126, 234, 0.3);
+    }
+    .result-card h4 {
+        color: #333;
+        margin: 0 0 10px 0;
+        font-weight: 600;
+    }
+    .result-card p {
+        color: #666;
+        margin: 5px 0;
+        font-size: 0.95em;
+    }
+    
+    /* 탭 디자인 */
+    .stTabs [data-baseweb="tab-list"] {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 5px;
+    }
+    .stTabs [data-baseweb="tab"] {
+        background: transparent;
         border-radius: 10px;
-        margin: 10px 0;
-        border-left: 4px solid #4CAF50;
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
     }
-    div[data-testid="stSidebar"] {
-        background-color: #f0f2f6;
+    .stTabs [aria-selected="true"] {
+        background: rgba(255, 255, 255, 0.9);
+        color: #667eea;
     }
-    .stProgress > div > div > div > div {
-        background-color: #4CAF50;
+    
+    /* 프로그레스 바 */
+    .stProgress > div > div > div {
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        height: 8px;
+        border-radius: 10px;
+    }
+    .stProgress > div > div {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+    }
+    
+    /* 헤더 타이틀 */
+    h1 {
+        color: white;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        font-weight: 700;
+        letter-spacing: 1px;
+    }
+    h2, h3 {
+        color: white;
+        font-weight: 600;
+    }
+    
+    /* 에러/성공 메시지 */
+    .stAlert {
+        border-radius: 15px;
+        border: none;
+        backdrop-filter: blur(10px);
+    }
+    
+    /* 다운로드 버튼 */
+    .stDownloadButton > button {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        border-radius: 25px;
+        padding: 12px 30px;
+        font-weight: 600;
+        border: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+    }
+    .stDownloadButton > button:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 8px 25px rgba(245, 87, 108, 0.6);
+    }
+    
+    /* 숫자 입력 */
+    .stNumberInput > div > div > input {
+        background: rgba(255, 255, 255, 0.9);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 15px;
+        padding: 12px 20px;
+        backdrop-filter: blur(10px);
+    }
+    
+    /* 선택 박스 */
+    .stSelectbox > div > div {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(10px);
+    }
+    
+    /* 파일 업로더 */
+    .stFileUploader {
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px dashed rgba(255, 255, 255, 0.5);
+        border-radius: 15px;
+        padding: 20px;
+        transition: all 0.3s ease;
+    }
+    .stFileUploader:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: #667eea;
+    }
+    
+    /* 사이드바 헤더 */
+    .css-1544g2n {
+        color: #667eea;
+        font-weight: 700;
+    }
+    
+    /* 데이터프레임 */
+    .dataframe {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    
+    /* 스크롤바 */
+    ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+    ::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -244,11 +428,11 @@ def analyze_organic_rankings(webkr_records, shopping_records, target_domain=None
 
 # 메인 앱
 def main():
-    st.title("🔍 네이버 쇼핑 키워드 분석기")
+    st.markdown("<h1 style='text-align: center; font-size: 3em; margin-bottom: 30px;'>🔍 네이버 쇼핑 키워드 분석기</h1>", unsafe_allow_html=True)
     
     # 사이드바 - API 설정
     with st.sidebar:
-        st.header("⚙️ API 설정")
+        st.markdown("<h2 style='text-align: center; margin-bottom: 20px;'>⚙️ API 설정</h2>", unsafe_allow_html=True)
         
         if 'client_id' not in st.session_state:
             st.session_state.client_id = ""
@@ -288,8 +472,8 @@ def main():
         col1, col2 = st.columns([1, 1])
         
         with col1:
-            st.subheader("검색 설정")
-            keyword = st.text_input("분석할 키워드:")
+            st.markdown("<h3 style='margin-bottom: 20px;'>🎯 검색 설정</h3>", unsafe_allow_html=True)
+            keyword = st.text_input("분석할 키워드:", placeholder="예: 운동화, 런닝화, 스니커즈...")
         
         with col2:
             if st.button("🔍 분석 시작", disabled=not (client_id and client_secret and keyword)):
@@ -323,8 +507,8 @@ def main():
                     if len(results['shopping']) == 0:
                         st.warning("🔍 검색 결과가 없습니다.")
                     else:
-                        st.subheader("📊 검색 결과")
-                        st.markdown(f"<div class='metric-card'>총 {len(results['shopping'])}개의 상품을 찾았습니다.</div>", unsafe_allow_html=True)
+                        st.markdown("<h3 style='margin: 30px 0 20px 0;'>📊 검색 결과</h3>", unsafe_allow_html=True)
+                        st.markdown(f"<div class='metric-card' style='text-align: center;'><h3>{len(results['shopping'])}</h3><p>개의 상품을 찾았습니다</p></div>", unsafe_allow_html=True)
                         
                         # 결과를 카드 형태로 표시
                         for i, item in enumerate(results['shopping'][:20]):
@@ -343,7 +527,7 @@ def main():
                             """, unsafe_allow_html=True)
     
     with tab2:
-        st.subheader("📝 일괄 키워드 분석")
+        st.markdown("<h3 style='margin-bottom: 20px;'>📝 일괄 키워드 분석</h3>", unsafe_allow_html=True)
         
         # 예시 파일 다운로드 기능
         col1, col2 = st.columns([1, 3])
@@ -497,7 +681,7 @@ def main():
                     result_df = pd.DataFrame(all_results)
                     
                     # 결과 요약
-                    st.subheader("📊 분석 결과")
+                    st.markdown("<h3 style='margin: 30px 0 20px 0;'>📊 분석 결과</h3>", unsafe_allow_html=True)
                     col1, col2, col3 = st.columns(3)
                     with col1:
                         st.markdown(f"<div class='metric-card'><h3>{len(keywords)}</h3><p>총 키워드</p></div>", unsafe_allow_html=True)
@@ -511,7 +695,7 @@ def main():
                     st.warning("🔍 검색 결과가 없습니다.")
                     
                     # 전체 데이터 표시
-                    st.subheader("🗂️ 전체 검색 결과")
+                    st.markdown("<h3 style='margin: 30px 0 20px 0;'>🗂️ 전체 검색 결과</h3>", unsafe_allow_html=True)
                     st.dataframe(result_df, use_container_width=True, height=600)
                     
                     # 엑셀 다운로드
