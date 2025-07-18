@@ -16,6 +16,57 @@ st.set_page_config(
     layout="wide"
 )
 
+# 커스텀 CSS
+st.markdown("""
+<style>
+    .stTextInput > div > div > input {
+        background-color: #f0f2f6;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        padding: 10px;
+        font-size: 16px;
+    }
+    .stTextInput > div > div > input:focus {
+        border-color: #4CAF50;
+        box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+    }
+    .stButton > button {
+        background-color: #4CAF50;
+        color: white;
+        border-radius: 20px;
+        padding: 10px 24px;
+        font-weight: bold;
+        border: none;
+        transition: all 0.3s;
+    }
+    .stButton > button:hover {
+        background-color: #45a049;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .metric-card {
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin: 10px 0;
+    }
+    .result-card {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 10px;
+        margin: 10px 0;
+        border-left: 4px solid #4CAF50;
+    }
+    div[data-testid="stSidebar"] {
+        background-color: #f0f2f6;
+    }
+    .stProgress > div > div > div > div {
+        background-color: #4CAF50;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # 사용자 로그 파일 경로
 LOG_FILE = "api_usage_logs.json"
 
@@ -81,6 +132,8 @@ def search_naver_webkr(query, client_id, client_secret, display=10):
         response = requests.get(url, headers=headers, params=params)
         if response.status_code == 200:
             return response.text
+        elif response.status_code == 401:
+            return "AUTH_ERROR"
         else:
             return None
     except Exception as e:
@@ -104,6 +157,8 @@ def search_naver_shopping(query, client_id, client_secret, display=20):
         response = requests.get(url, headers=headers, params=params)
         if response.status_code == 200:
             return response.text
+        elif response.status_code == 401:
+            return "AUTH_ERROR"
         else:
             return None
     except Exception as e:
@@ -183,22 +238,36 @@ def main():
     with st.sidebar:
         st.header("⚙️ API 설정")
         
-        client_id = st.text_input("네이버 클라이언트 ID", type="password")
-        client_secret = st.text_input("네이버 클라이언트 시크릿", type="password")
+        if 'client_id' not in st.session_state:
+            st.session_state.client_id = ""
+        if 'client_secret' not in st.session_state:
+            st.session_state.client_secret = ""
+        
+        client_id = st.text_input(
+            "네이버 클라이언트 ID", 
+            type="password",
+            value=st.session_state.client_id,
+            key="client_id_input",
+            placeholder="클라이언트 ID를 입력하세요"
+        )
+        client_secret = st.text_input(
+            "네이버 클라이언트 시크릿", 
+            type="password",
+            value=st.session_state.client_secret,
+            key="client_secret_input",
+            placeholder="클라이언트 시크릿을 입력하세요"
+        )
+        
+        if client_id:
+            st.session_state.client_id = client_id
+        if client_secret:
+            st.session_state.client_secret = client_secret
         
         if client_id:
             can_use, today_usage = check_daily_limit(client_id)
-            st.info(f"📊 오늘 사용량: {today_usage:,}/25,000")
-            
-            # 사용량 진행률 바
-            progress_percentage = min(today_usage / 25000, 1.0)
-            st.progress(progress_percentage)
             
             if not can_use:
                 st.error("⚠️ 오늘 사용 한도를 초과했습니다!")
-            else:
-                remaining = 25000 - today_usage
-                st.success(f"✅ 남은 사용량: {remaining:,}회")
     
     # 메인 컨텐츠
     tab1, tab2 = st.tabs(["🔍 키워드 분석", "📊 일괄 검색"])
@@ -216,30 +285,41 @@ def main():
                 
                 # 쇼핑검색
                 shopping_xml = search_naver_shopping(keyword, client_id, client_secret)
-                if shopping_xml:
+                if shopping_xml == "AUTH_ERROR":
+                    st.error("❌ API 키를 확인해주세요. 잘못된 인증정보입니다.")
+                    return
+                elif shopping_xml:
                     shopping_records = parse_shopping_xml(shopping_xml)
                     results['shopping'] = shopping_records
-                
-                # 사용량 업데이트
-                update_usage_count(client_id, 1)
+                    # 사용량 업데이트
+                    update_usage_count(client_id, 1)
+                else:
+                    st.error("❌ 검색 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.")
+                    return
                 
                 # 결과 분석
                 if results and 'shopping' in results:
-                    st.subheader("📊 검색 결과")
-                    
-                    # 결과를 카드 형태로 표시
-                    for i, item in enumerate(results['shopping'][:20]):
-                        price = f"{int(item['lprice']):,}원" if item['lprice'] else "가격정보 없음"
-                        brand_info = f" | 브랜드: {item['brand']}" if item.get('brand') else ""
-                        maker_info = f" | 제조사: {item['maker']}" if item.get('maker') else ""
-                        category = f"{item.get('category1', '')} > {item.get('category2', '')}" if item.get('category1') else ""
+                    if len(results['shopping']) == 0:
+                        st.warning("🔍 검색 결과가 없습니다.")
+                    else:
+                        st.subheader("📊 검색 결과")
+                        st.markdown(f"<div class='metric-card'>총 {len(results['shopping'])}개의 상품을 찾았습니다.</div>", unsafe_allow_html=True)
                         
-                        # 카드 스타일로 표시
-                        with st.container():
-                            st.markdown(f"**{i+1}. {item['title']}**")
-                            st.caption(f"🏪 {item['mallName']}{brand_info}{maker_info}")
-                            st.caption(f"💰 {price} | 📂 {category}")
-                            st.divider()
+                        # 결과를 카드 형태로 표시
+                        for i, item in enumerate(results['shopping'][:20]):
+                            price = f"{int(item['lprice']):,}원" if item['lprice'] else "가격정보 없음"
+                            brand_info = f" | 브랜드: {item['brand']}" if item.get('brand') else ""
+                            maker_info = f" | 제조사: {item['maker']}" if item.get('maker') else ""
+                            category = f"{item.get('category1', '')} > {item.get('category2', '')}" if item.get('category1') else ""
+                            
+                            # 카드 스타일로 표시
+                            st.markdown(f"""
+                            <div class='result-card'>
+                                <h4>{i+1}. {item['title']}</h4>
+                                <p>🏪 {item['mallName']}{brand_info}{maker_info}</p>
+                                <p>💰 {price} | 📂 {category}</p>
+                            </div>
+                            """, unsafe_allow_html=True)
     
     with tab2:
         st.subheader("📝 일괄 키워드 분석")
@@ -305,13 +385,15 @@ def main():
             
             # 예상 사용량 계산
             expected_usage = len(keywords)
-            can_use, today_usage = check_daily_limit(client_id)
+            can_use, today_usage = check_daily_limit(client_id) if client_id else (True, 0)
             remaining = 25000 - today_usage
             
-            st.info(f"예상 API 호출 횟수: {expected_usage:,}회")
-            
-            if expected_usage > remaining:
-                st.error(f"⚠️ 남은 한도({remaining:,})를 초과합니다!")
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown(f"<div class='metric-card'>📊 예상 API 호출: {expected_usage:,}회</div>", unsafe_allow_html=True)
+            with col2:
+                if expected_usage > remaining:
+                    st.error(f"⚠️ 남은 한도({remaining:,})를 초과합니다!")
                 
             if st.button("🚀 일괄 분석 시작", disabled=not (client_id and client_secret and keywords)):
                 if expected_usage > remaining:
@@ -342,7 +424,10 @@ def main():
                     
                     # 쇼핑검색
                     shopping_xml = search_naver_shopping(keyword, client_id, client_secret, display=display_count)
-                    if shopping_xml:
+                    if shopping_xml == "AUTH_ERROR":
+                        st.error("❌ API 키를 확인해주세요. 잘못된 인증정보입니다.")
+                        return
+                    elif shopping_xml:
                         shopping_records = parse_shopping_xml(shopping_xml)
                         
                         # 각 상품별로 row 생성 - 모든 필드 포함
@@ -385,13 +470,15 @@ def main():
                     st.subheader("📊 분석 결과")
                     col1, col2, col3 = st.columns(3)
                     with col1:
-                        st.metric("총 키워드", f"{len(keywords)}개")
+                        st.markdown(f"<div class='metric-card'><h3>{len(keywords)}</h3><p>총 키워드</p></div>", unsafe_allow_html=True)
                     with col2:
-                        st.metric("총 검색 결과", f"{len(all_results)}개")
+                        st.markdown(f"<div class='metric-card'><h3>{len(all_results)}</h3><p>총 검색 결과</p></div>", unsafe_allow_html=True)
                     with col3:
                         if 'mall' in result_df.columns:
                             unique_malls = result_df['mall'].nunique()
-                            st.metric("쇼핑몰 수", f"{unique_malls}개")
+                            st.markdown(f"<div class='metric-card'><h3>{unique_malls}</h3><p>쇼핑몰 수</p></div>", unsafe_allow_html=True)
+                else:
+                    st.warning("🔍 검색 결과가 없습니다.")
                     
                     # 전체 데이터 표시
                     st.subheader("🗂️ 전체 검색 결과")
